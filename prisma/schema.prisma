@@ -1,0 +1,58 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id       Int     @id @default(autoincrement())
+  email    String  @unique @db.VarChar(45)
+  password String  @db.VarChar(45)
+  role     Boolean
+
+  //O perfilId REFERENCIA O Id NA TABELA PERFIL
+  perfil   Profile @relation(fields: [perfilId], references: [id])
+  perfilId Int     @unique
+
+  //RELAÇÃO 1 PRA MUITOS  
+  post Post[] //ARRAY DE POSTAGENS
+}
+
+model Profile {
+  id           Int      @id @default(autoincrement())
+  name         String   @db.VarChar(100)
+  phone_number String   @db.VarChar(11)
+  age          DateTime
+  bio          String?  @db.VarChar(1000)
+  photo        String?
+
+  //RELAÇÃO 1 PRA 1
+  user User?
+}
+
+model Post {
+  id      Int    @id @default(autoincrement())
+  title   String @db.VarChar(255)
+  content String @db.Text
+
+  //O userId REFERENCIA O Id NA TABELA USER
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  //RELAÇÃO MUITOS PRA MUITOS  
+  category Category[] //ARRAY DE CATEGORIA
+}
+
+model Category {
+  id   Int    @id @default(autoincrement())
+  name String @db.VarChar(100)
+
+  //RELAÇÃO MUITOS PRA MUITOS  
+  post Post[] //ARRAY DE POSTAGENS
+}
